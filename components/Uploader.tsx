@@ -3,6 +3,10 @@ import { useState } from 'react'
 import { upload } from '@vercel/blob/client'
 import { makeThumbnail } from '@/lib/thumbnail'
 import { isAllowedType, mediaKind } from '@/lib/validation'
+import { lang } from '@/lib/branding'
+import { getStrings } from '@/lib/strings'
+
+const t = getStrings(lang)
 
 type Status = { id: string; name: string; state: 'läuft' | 'fertig' | 'fehler'; message?: string }
 
@@ -14,12 +18,12 @@ export default function Uploader({ onDone }: { onDone: () => void }) {
     for (const file of Array.from(files)) {
       const id = crypto.randomUUID()
       if (!isAllowedType(file.type)) {
-        setStatuses((s) => [{ id, name: file.name, state: 'fehler', message: 'Dateityp nicht erlaubt' }, ...s])
+        setStatuses((s) => [{ id, name: file.name, state: 'fehler', message: t.typeNotAllowed }, ...s])
         continue
       }
       const kind = mediaKind(file.type)
       if (!kind) {
-        setStatuses((s) => [{ id, name: file.name, state: 'fehler', message: 'Dateityp nicht erlaubt' }, ...s])
+        setStatuses((s) => [{ id, name: file.name, state: 'fehler', message: t.typeNotAllowed }, ...s])
         continue
       }
       setStatuses((s) => [{ id, name: file.name, state: 'läuft' }, ...s])
@@ -40,7 +44,7 @@ export default function Uploader({ onDone }: { onDone: () => void }) {
             filename: file.name, type: kind, sizeBytes: file.size,
           }),
         })
-        if (!res.ok) throw new Error((await res.json()).error ?? 'Fehler')
+        if (!res.ok) throw new Error((await res.json()).error ?? t.genericError)
         setStatuses((s) => s.map((x) => x.id === id && x.state === 'läuft'
           ? { id, name: file.name, state: 'fertig' } : x))
         onDone()
@@ -57,7 +61,7 @@ export default function Uploader({ onDone }: { onDone: () => void }) {
         textAlign: 'center', borderRadius: 12, cursor: 'pointer' }}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => { e.preventDefault(); handleFiles(e.dataTransfer.files) }}>
-        Bilder oder Videos hierher ziehen oder klicken zum Auswählen
+        {t.dropzone}
         <input type="file" multiple accept="image/*,video/mp4" style={{ display: 'none' }}
           onChange={(e) => handleFiles(e.target.files)} />
       </label>

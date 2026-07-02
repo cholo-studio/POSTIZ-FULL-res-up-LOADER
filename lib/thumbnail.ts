@@ -1,4 +1,8 @@
 import { thumbnailSize } from '@/lib/dimensions'
+import { lang } from '@/lib/branding'
+import { getStrings } from '@/lib/strings'
+
+const t = getStrings(lang)
 
 // Browser-only. Produces a small JPEG Blob preview for an image or video file.
 export async function makeThumbnail(file: File): Promise<Blob> {
@@ -29,7 +33,7 @@ async function frameFromVideo(file: File) {
   await new Promise<void>((res, rej) => {
     video.onloadeddata = () => { video.currentTime = Math.min(0.1, video.duration || 0.1) }
     video.onseeked = () => res()
-    video.onerror = () => rej(new Error('Video konnte nicht gelesen werden'))
+    video.onerror = () => rej(new Error(t.videoReadError))
   })
   const width = video.videoWidth
   const height = video.videoHeight

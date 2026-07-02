@@ -1,5 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { lang } from '@/lib/branding'
+import { getStrings } from '@/lib/strings'
+
+const t = getStrings(lang)
 
 interface Entry {
   id: string; filename: string; type: string; thumbnailUrl: string; postizPath: string; uploadedAt: string
@@ -12,7 +16,7 @@ export default function HistoryGallery({ reloadKey }: { reloadKey: number }) {
   }, [reloadKey])
   return (
     <section style={{ marginTop: 32 }}>
-      <h2>Zuletzt hochgeladen</h2>
+      <h2>{t.recentlyUploaded}</h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
         {entries.map((e) => (
           <figure key={e.id} style={{ margin: 0 }}>
@@ -20,7 +24,7 @@ export default function HistoryGallery({ reloadKey }: { reloadKey: number }) {
             <figcaption style={{ fontSize: 12 }}>
               {e.filename}
               <button style={{ display: 'block', marginTop: 4 }}
-                onClick={() => navigator.clipboard.writeText(e.postizPath)}>Postiz-Link kopieren</button>
+                onClick={() => navigator.clipboard.writeText(e.postizPath)}>{t.copyPostizLink}</button>
             </figcaption>
           </figure>
         ))}
