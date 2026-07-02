@@ -3,7 +3,6 @@ import { del } from '@vercel/blob'
 import { requireSession } from '@/lib/auth-guard'
 import { finalizeUpload, FinalizeInput } from '@/lib/finalize'
 import { uploadFromUrl } from '@/lib/postiz'
-import { mediaKind } from '@/lib/validation'
 
 export async function POST(request: Request): Promise<Response> {
   if (!(await requireSession(request))) {
@@ -13,7 +12,7 @@ export async function POST(request: Request): Promise<Response> {
   if (!apiKey) return Response.json({ error: 'Server nicht konfiguriert' }, { status: 500 })
 
   const body = (await request.json()) as Partial<FinalizeInput>
-  if (!body.originalBlobUrl || !body.thumbnailBlobUrl || !body.filename || !body.type) {
+  if (!body.originalBlobUrl || !body.thumbnailBlobUrl || !body.filename || !body.type || typeof body.sizeBytes !== 'number') {
     return Response.json({ error: 'Unvollständige Anfrage' }, { status: 400 })
   }
   try {

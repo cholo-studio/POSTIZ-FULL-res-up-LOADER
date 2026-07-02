@@ -29,7 +29,7 @@ const input: FinalizeInput = {
 }
 
 test('ingests to Postiz, stores history, deletes only the original blob', async () => {
-  const { d, deleted } = deps()
+  const { d, deleted, pushed } = deps()
   const entry = await finalizeUpload(input, d)
   expect(d.uploadFromUrl).toHaveBeenCalledWith(
     expect.objectContaining({ apiKey: 'KEY', url: 'https://blob/orig.jpg' }),
@@ -40,6 +40,7 @@ test('ingests to Postiz, stores history, deletes only the original blob', async 
     postizId: 'p1', uploadedAt: '2026-07-02T10:00:00.000Z',
   })
   expect(deleted).toEqual(['https://blob/orig.jpg'])
+  expect(pushed).toHaveLength(1)
 })
 
 test('does not delete the original blob if Postiz ingest fails', async () => {
