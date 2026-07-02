@@ -1,0 +1,4 @@
+:root { --primary: #C8102E; --accent: #F2A93B; --bg: #14151a; --fg: #f4f4f5; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--fg); }
+button { cursor: pointer; }
