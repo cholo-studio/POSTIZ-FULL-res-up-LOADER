@@ -8,7 +8,7 @@ interface Entry {
 export default function HistoryGallery({ reloadKey }: { reloadKey: number }) {
   const [entries, setEntries] = useState<Entry[]>([])
   useEffect(() => {
-    fetch('/api/history').then((r) => r.json()).then((d) => setEntries(d.entries ?? []))
+    fetch('/api/history').then((r) => r.json()).then((d) => setEntries(d.entries ?? [])).catch(() => setEntries([]))
   }, [reloadKey])
   return (
     <section style={{ marginTop: 32 }}>

@@ -25,6 +25,7 @@ async function frameFromVideo(file: File) {
   const video = document.createElement('video')
   video.src = url
   video.muted = true
+  video.load()
   await new Promise<void>((res, rej) => {
     video.onloadeddata = () => { video.currentTime = Math.min(0.1, video.duration || 0.1) }
     video.onseeked = () => res()

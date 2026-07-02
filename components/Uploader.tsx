@@ -4,7 +4,7 @@ import { upload } from '@vercel/blob/client'
 import { makeThumbnail } from '@/lib/thumbnail'
 import { isAllowedType, mediaKind } from '@/lib/validation'
 
-type Status = { name: string; state: 'läuft' | 'fertig' | 'fehler'; message?: string }
+type Status = { id: string; name: string; state: 'läuft' | 'fertig' | 'fehler'; message?: string }
 
 export default function Uploader({ onDone }: { onDone: () => void }) {
   const [statuses, setStatuses] = useState<Status[]>([])
@@ -12,12 +12,15 @@ export default function Uploader({ onDone }: { onDone: () => void }) {
   async function handleFiles(files: FileList | null) {
     if (!files) return
     for (const file of Array.from(files)) {
+      const id = crypto.randomUUID()
       if (!isAllowedType(file.type)) {
-        setStatuses((s) => [{ name: file.name, state: 'fehler', message: 'Dateityp nicht erlaubt' }, ...s])
+        setStatuses((s) => [{ id, name: file.name, state: 'fehler', message: 'Dateityp nicht erlaubt' }, ...s])
         continue
       }
-      setStatuses((s) => [{ name: file.name, state: 'läuft' }, ...s])
+      setStatuses((s) => [{ id, name: file.name, state: 'läuft' }, ...s])
       try {
+        const kind = mediaKind(file.type)
+        if (!kind) continue
         const thumb = await makeThumbnail(file)
         const original = await upload(file.name, file, {
           access: 'public', handleUploadUrl: '/api/blob-token',
@@ -31,16 +34,16 @@ export default function Uploader({ onDone }: { onDone: () => void }) {
           method: 'POST', headers: { 'content-type': 'application/json' },
           body: JSON.stringify({
             originalBlobUrl: original.url, thumbnailBlobUrl: thumbUp.url,
-            filename: file.name, type: mediaKind(file.type), sizeBytes: file.size,
+            filename: file.name, type: kind, sizeBytes: file.size,
           }),
         })
         if (!res.ok) throw new Error((await res.json()).error ?? 'Fehler')
-        setStatuses((s) => s.map((x) => x.name === file.name && x.state === 'läuft'
-          ? { name: file.name, state: 'fertig' } : x))
+        setStatuses((s) => s.map((x) => x.id === id && x.state === 'läuft'
+          ? { id, name: file.name, state: 'fertig' } : x))
         onDone()
       } catch (err) {
-        setStatuses((s) => s.map((x) => x.name === file.name && x.state === 'läuft'
-          ? { name: file.name, state: 'fehler', message: (err as Error).message } : x))
+        setStatuses((s) => s.map((x) => x.id === id && x.state === 'läuft'
+          ? { id, name: file.name, state: 'fehler', message: (err as Error).message } : x))
       }
     }
   }
@@ -56,8 +59,8 @@ export default function Uploader({ onDone }: { onDone: () => void }) {
           onChange={(e) => handleFiles(e.target.files)} />
       </label>
       <ul style={{ listStyle: 'none', padding: 0 }}>
-        {statuses.map((s, i) => (
-          <li key={i} style={{ padding: 8 }}>
+        {statuses.map((s) => (
+          <li key={s.id} style={{ padding: 8 }}>
             {s.state === 'fertig' ? '✓' : s.state === 'fehler' ? '✕' : '…'} {s.name}
             {s.message ? ` — ${s.message}` : ''}
           </li>
