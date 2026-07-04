@@ -1,5 +1,7 @@
 # Postiz Full-Res Uploader
 
+![CI](https://github.com/cholo-studio/postiz-fullres-uploader/actions/workflows/ci.yml/badge.svg)
+
 Upload images and videos to your Postiz media library at full resolution — no downscaling, no Postiz account required for staff.
 
 Built by Cholo Studio · MIT License
