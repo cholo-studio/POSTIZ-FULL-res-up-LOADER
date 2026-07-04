@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv'
+import { kv } from '@/lib/kv'
 import { del } from '@vercel/blob'
 import { requireSession } from '@/lib/auth-guard'
 import { finalizeUpload, FinalizeInput } from '@/lib/finalize'

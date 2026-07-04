@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv'
+import { kv } from '@/lib/kv'
 import { requireSession } from '@/lib/auth-guard'
 import { listEntries } from '@/lib/history'
 
