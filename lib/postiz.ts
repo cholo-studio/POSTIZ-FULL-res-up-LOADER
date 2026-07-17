@@ -32,6 +32,9 @@ export async function uploadFromUrl(opts: {
   })
   if (!res.ok) {
     const text = await res.text().catch(() => '')
+    // TEMP diagnostic: surface the exact URL we sent and Postiz's response so the
+    // failing case (extension/casing/host) is visible in Vercel runtime logs.
+    console.error('[postiz.uploadFromUrl] failed', { status: res.status, url: opts.url, response: text })
     throw new Error(`Postiz-Upload fehlgeschlagen (${res.status}): ${text}`)
   }
   const data = (await res.json()) as PostizUpload
