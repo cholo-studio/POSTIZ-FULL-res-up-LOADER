@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { upload } from '@vercel/blob/client'
 import { makeThumbnail } from '@/lib/thumbnail'
-import { isAllowedType, mediaKind } from '@/lib/validation'
+import { isAllowedType, mediaKind, lowercaseExtension } from '@/lib/validation'
 import { lang } from '@/lib/branding'
 import { getStrings } from '@/lib/strings'
 
@@ -29,11 +29,12 @@ export default function Uploader({ onDone }: { onDone: () => void }) {
       setStatuses((s) => [{ id, name: file.name, state: 'running' }, ...s])
       try {
         const thumb = await makeThumbnail(file)
-        const original = await upload(file.name, file, {
+        const uploadName = lowercaseExtension(file.name)
+        const original = await upload(uploadName, file, {
           access: 'public', handleUploadUrl: '/api/blob-token',
           clientPayload: JSON.stringify({ type: file.type }),
         })
-        const thumbUp = await upload(`thumb-${file.name}.jpg`, thumb, {
+        const thumbUp = await upload(`thumb-${uploadName}.jpg`, thumb, {
           access: 'public', handleUploadUrl: '/api/blob-token',
           clientPayload: JSON.stringify({ type: 'image/jpeg' }),
         })
